@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shortest Path Algorithms</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --amber:  #f5a623;
+    --green:  #4ecb8d;
+    --purple: #a78bfa;
+    --blue:   #60a5fa;
+    --red:    #f87171;
+    --bg:     #0a0a0f;
+    --bg2:    #10101a;
+    --bg3:    #181824;
+    --border: #2a2a3a;
+    --text:   #e8e8f0;
+    --muted:  #8888a8;
+  }
+
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section { background: transparent; }
+
+  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
+  .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
+  .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
+  .reveal p  { font-size: .56em; line-height: 1.45; color: var(--text); }
+  .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
+  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
+                 border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+
+  /* ── slide chrome ── */
+  .slide-hdr {
+    display: flex; align-items: center; gap: .4em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .2em; margin-bottom: .3em;
+  }
+  .slide-hdr .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .42em; font-weight: 500;
+    color: var(--bg); background: var(--amber);
+    padding: .1em .4em; border-radius: 3px;
+    letter-spacing: .04em;
+  }
+  .slide-hdr h2 { margin: 0; font-size: .95em; }
+
+  /* ── two-column ── */
+  .cols   { display: grid; gap: .5em; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-6040 { grid-template-columns: 6fr 4fr; }
+  .cols-4060 { grid-template-columns: 4fr 6fr; }
+
+  /* ── cards ── */
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: .35em .6em;
+  }
+  .card.amber { border-left: 3px solid var(--amber); }
+  .card.green { border-left: 3px solid var(--green); }
+  .card.purple{ border-left: 3px solid var(--purple); }
+  .card.blue  { border-left: 3px solid var(--blue); }
+  .card.red   { border-left: 3px solid var(--red); }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; }
+  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card ul { margin: 0; padding-left: 1em; }
+  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+
+  /* ── table ── */
+  .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
+  .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
+                     padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
+  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+
+  /* ── accent spans ── */
+  .a  { color: var(--amber); font-weight: 600; }
+  .g  { color: var(--green); font-weight: 600; }
+  .p  { color: var(--purple); font-weight: 600; }
+  .b  { color: var(--blue); font-weight: 600; }
+  .r  { color: var(--red); font-weight: 600; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── SVG graph diagrams ── */
+  svg.diagram { display: block; margin: 0 auto; overflow: visible; }
+
+  /* ── pill badges ── */
+  .pill {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: .44em; padding: .08em .4em; border-radius: 99px;
+    border: 1px solid; margin: 0 .08em;
+  }
+  .pill.amber { color: var(--amber); border-color: var(--amber); }
+  .pill.green { color: var(--green); border-color: var(--green); }
+  .pill.purple{ color: var(--purple); border-color: var(--purple); }
+  .pill.blue  { color: var(--blue); border-color: var(--blue); }
+
+  /* ── footer — hidden ── */
+  .reveal .slide-footer { display: none; }
+  /* title slide special */
+  .title-slide h1 { font-size: 1.8em; }
+  .title-slide .subtitle {
+    font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em;
+  }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── super-step animator ── */
+  .ss-row {
+    display: flex; gap: .25em; align-items: center;
+    margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace;
+  }
+  .ss-node {
+    padding: .2em .55em; border-radius: 5px; font-size: .9em;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  }
+  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
+  .ss-node.done   { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-arrow { color: var(--amber); }
+  .ss-label { font-size: .8em; color: var(--muted); margin-left: .3em; }
+
+  /* reduce default margins */
+  .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
+.reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 01 — Title
+══════════════════════════════════════════════════════════════════ -->
+<section class="title-slide" data-background-color="#0a0a0f">
+  <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">COMPUTER SCIENCE FUNDAMENTALS SERIES</div>
+  <h1>Shortest Path<br>Algorithms</h1>
+  <div class="subtitle">
+    Dijkstra &middot; Bellman-Ford &middot; Floyd-Warshall &middot; A* search &middot;<br>
+    Negative cycles &middot; Routing algorithms
+  </div>
+  <div style="width:60px; height:3px; background:var(--amber); margin-bottom:1.4em;"></div>
+  <div class="meta">
+    Mid-level software engineer track &nbsp;&middot;&nbsp; 20 slides
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 02 — Single-Source Shortest Path Problem
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">02</span>
+    <h2>Single-Source Shortest Path Problem</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <h3>Definition</h3>
+      <p>Given a weighted directed graph <code>G = (V, E)</code> with weight function <code>w: E &rarr; R</code> and a source vertex <code>s</code>, find the shortest-weight path from <code>s</code> to every reachable vertex.</p>
+      <ul>
+        <li><span class="a">Path weight</span> &mdash; sum of edge weights along the path: <code>w(p) = &Sigma; w(v<sub>i</sub>, v<sub>i+1</sub>)</code></li>
+        <li><span class="a">Shortest-path weight</span> &mdash; <code>&delta;(s, v) = min { w(p) : s &#x2933; v }</code> or <code>+&infin;</code> if unreachable</li>
+        <li><span class="a">Predecessor sub-graph</span> &mdash; encodes the shortest-path tree rooted at <code>s</code></li>
+      </ul>
+      <h3 style="margin-top:.4em">Optimal sub-structure</h3>
+      <p>Any sub-path of a shortest path is itself a shortest path. This property is the foundation for every algorithm in this deck.</p>
+    </div>
+    <div>
+      <h3>Problem variants</h3>
+      <table>
+        <thead><tr><th>Variant</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">Single-source</span></td><td>One source to all vertices &mdash; Dijkstra, Bellman-Ford</td></tr>
+          <tr><td><span class="g">Single-destination</span></td><td>All vertices to one target &mdash; reverse edges, run single-source</td></tr>
+          <tr><td><span class="p">Single-pair</span></td><td>One source to one target &mdash; A*, bidirectional search</td></tr>
+          <tr><td><span class="b">All-pairs</span></td><td>Every vertex to every vertex &mdash; Floyd-Warshall, Johnson's</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:.6em">
+        <svg class="diagram" width="320" height="140" viewBox="0 0 320 140">
+          <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f5a623"/></marker></defs>
+          <circle cx="40" cy="70" r="20" fill="none" stroke="#4ecb8d" stroke-width="2"/>
+          <text x="40" y="75" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="14">s</text>
+          <circle cx="140" cy="30" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
+          <text x="140" y="35" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">a</text>
+          <circle cx="140" cy="110" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
+          <text x="140" y="115" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">b</text>
+          <circle cx="240" cy="70" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
+          <text x="240" y="75" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">c</text>
+          <circle cx="300" cy="70" r="20" fill="none" stroke="#f87171" stroke-width="2"/>
+          <text x="300" y="75" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">t</text>
+          <line x1="60" y1="58" x2="118" y2="35" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="80" y="40" fill="#8888a8" font-family="JetBrains Mono" font-size="11">4</text>
+          <line x1="60" y1="82" x2="118" y2="105" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="80" y="105" fill="#8888a8" font-family="JetBrains Mono" font-size="11">2</text>
+          <line x1="160" y1="30" x2="218" y2="62" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="185" y="38" fill="#8888a8" font-family="JetBrains Mono" font-size="11">3</text>
+          <line x1="160" y1="105" x2="218" y2="78" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="185" y="105" fill="#8888a8" font-family="JetBrains Mono" font-size="11">5</text>
+          <line x1="260" y1="70" x2="278" y2="70" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="268" y="62" fill="#8888a8" font-family="JetBrains Mono" font-size="11">1</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 03 — BFS for Unweighted Graphs
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">03</span>
+    <h2>BFS for Unweighted Graphs</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <p>BFS solves single-source shortest paths when every edge has weight 1. It processes vertices in order of increasing distance from the source.</p>
+      <pre><code class="language-python">from collections import deque
+
+def bfs_shortest(graph, source):
+    dist = {v: float('inf') for v in graph}
+    dist[source] = 0
+    prev = {v: None for v in graph}
+    queue = deque([source])
+
+    while queue:
+        u = queue.popleft()
+        for v in graph[u]:
+            if dist[v] == float('inf'):
+                dist[v] = dist[u] + 1
+                prev[v] = u
+                queue.append(v)
+    return dist, prev</code></pre>
+    </div>
+    <div>
+      <h3>Properties</h3>
+      <div class="card amber" style="margin-bottom:.3em">
+        <h3>Time complexity</h3>
+        <p><code>O(V + E)</code> &mdash; optimal for unweighted graphs</p>
+      </div>
+      <div class="card green" style="margin-bottom:.3em">
+        <h3>Space complexity</h3>
+        <p><code>O(V)</code> for the queue and distance array</p>
+      </div>
+      <div class="card purple" style="margin-bottom:.3em">
+        <h3>Correctness</h3>
+        <p>Vertices are discovered in non-decreasing distance order; once dequeued, distance is final</p>
+      </div>
+      <p style="margin-top:.4em; font-size:.5em; color:var(--muted)">BFS is the baseline. When edges have varying weights, we need more sophisticated approaches &mdash; but for unit-weight graphs, nothing beats BFS.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 04 — Dijkstra's Algorithm
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">04</span>
+    <h2>Dijkstra's Algorithm</h2>
+  </div>
+  <p>Dijkstra's algorithm (1959) solves single-source shortest paths for graphs with <span class="a">non-negative edge weights</span>. Greedily extract the vertex with the smallest tentative distance &mdash; its distance is then final. Relax all outgoing edges.</p>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-python">def dijkstra(graph, source):
+    dist = {v: float('inf') for v in graph}
+    prev = {v: None for v in graph}
+    dist[source] = 0
+    Q = set(graph.keys())
+
+    while Q:
+        u = min(Q, key=lambda v: dist[v])
+        Q.remove(u)
+        for v, w in graph[u]:
+            if v in Q and dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                prev[v] = u
+    return dist, prev</code></pre>
+      <p style="font-size:.48em; color:var(--muted); margin-top:.3em">Array-based version shown for clarity &mdash; <code>O(V&sup2;)</code>. Priority queue version on next slide.</p>
+    </div>
+    <div>
+      <h3>Relaxation</h3>
+      <p>The fundamental operation. For edge <code>(u, v)</code> with weight <code>w</code>:</p>
+      <pre><code class="language-python">if dist[u] + w < dist[v]:
+    dist[v] = dist[u] + w
+    prev[v] = u</code></pre>
+      <h3 style="margin-top:.3em">Key constraint</h3>
+      <div class="card red">
+        <p>All edge weights must be non-negative: <code>w(u, v) &ge; 0</code>. Negative weights break the greedy guarantee &mdash; a settled vertex could later be improved via a negative edge.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 05 — Dijkstra — Priority Queue Implementation
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">05</span>
+    <h2>Dijkstra &mdash; Priority Queue Implementation</h2>
+  </div>
+  <p>The choice of priority queue determines Dijkstra's time complexity:</p>
+  <table>
+    <thead><tr><th>Priority Queue</th><th>extract-min</th><th>decrease-key</th><th>Total Complexity</th></tr></thead>
+    <tbody>
+      <tr><td><span class="a">Array (unsorted)</span></td><td><code>O(V)</code></td><td><code>O(1)</code></td><td><code>O(V&sup2;)</code></td></tr>
+      <tr><td><span class="g">Binary heap</span></td><td><code>O(log V)</code></td><td><code>O(log V)</code></td><td><code>O((V + E) log V)</code></td></tr>
+      <tr><td><span class="p">Fibonacci heap</span></td><td><code>O(log V)</code> amortised</td><td><code>O(1)</code> amortised</td><td><code>O(V log V + E)</code></td></tr>
+    </tbody>
+  </table>
+  <div class="cols cols-2" style="margin-top:.4em">
+    <div>
+      <h3>Lazy deletion (practical default)</h3>
+      <pre><code class="language-python">import heapq
+
+def dijkstra(graph, source):
+    dist = {v: float('inf') for v in graph}
+    dist[source] = 0
+    pq = [(0, source)]
+
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]:
+            continue  # stale entry
+        for v, w in graph[u]:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                heapq.heappush(pq, (dist[v], v))
+    return dist</code></pre>
+    </div>
+    <div>
+      <h3>Practical notes</h3>
+      <ul>
+        <li><span class="g">Binary heap</span> is the standard choice &mdash; simple, cache-friendly, fast in practice</li>
+        <li><span class="p">Fibonacci heap</span> wins asymptotically for dense graphs (<code>E &gt;&gt; V</code>) but has high constant factors</li>
+        <li><span class="a">Lazy deletion</span> avoids decrease-key entirely; push new <code>(dist, v)</code> pairs and skip stale entries on extraction</li>
+        <li>For <span class="b">integer weights</span> in range <code>[0, C]</code>, dial's algorithm achieves <code>O(V + E + C)</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 06 — Dijkstra — Proof of Correctness
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">06</span>
+    <h2>Dijkstra &mdash; Proof of Correctness</h2>
+  </div>
+  <h3>Theorem</h3>
+  <p>When Dijkstra extracts vertex <code>u</code> from the priority queue, <code>dist[u] = &delta;(s, u)</code>.</p>
+  <h3>Proof sketch (by contradiction)</h3>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber" style="margin-bottom:.25em">
+        <h3>Step 1 &mdash; Assumption</h3>
+        <p>Suppose <code>u</code> is the first vertex extracted with <code>dist[u] &gt; &delta;(s, u)</code>.</p>
+      </div>
+      <div class="card green" style="margin-bottom:.25em">
+        <h3>Step 2 &mdash; Crossing edge</h3>
+        <p>Let <code>p</code> be a true shortest path <code>s &#x2933; u</code>. Let <code>(x, y)</code> be the first edge on <code>p</code> crossing from settled set <code>S</code> to unsettled <code>V - S</code>.</p>
+      </div>
+      <div class="card purple" style="margin-bottom:.25em">
+        <h3>Step 3 &mdash; x is correct</h3>
+        <p>Since <code>x &isin; S</code>, <code>dist[x] = &delta;(s, x)</code> (by assumption, <code>u</code> is the first violation).</p>
+      </div>
+    </div>
+    <div>
+      <div class="card blue" style="margin-bottom:.25em">
+        <h3>Step 4 &mdash; Relaxation</h3>
+        <p>After relaxing <code>(x, y)</code>: <code>dist[y] &le; dist[x] + w(x,y) = &delta;(s, y)</code></p>
+      </div>
+      <div class="card amber" style="margin-bottom:.25em">
+        <h3>Step 5 &mdash; Non-negative weights</h3>
+        <p>Since all weights &ge; 0: <code>&delta;(s, y) &le; &delta;(s, u) &lt; dist[u]</code></p>
+      </div>
+      <div class="card red" style="margin-bottom:.25em">
+        <h3>Step 6 &mdash; Contradiction</h3>
+        <p>Then <code>dist[y] &lt; dist[u]</code>, so the priority queue would extract <code>y</code> before <code>u</code> &mdash; contradiction.</p>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:.48em; color:var(--muted); margin-top:.3em">The non-negative weight assumption is essential in step 5. With negative edges, <code>&delta;(s, y)</code> could exceed <code>&delta;(s, u)</code> via a later negative edge, and the proof breaks.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 07 — Bellman-Ford Algorithm
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">07</span>
+    <h2>Bellman-Ford Algorithm</h2>
+  </div>
+  <p>Bellman-Ford handles graphs with <span class="a">negative edge weights</span> (but no negative cycles reachable from <code>s</code>).</p>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-python">def bellman_ford(vertices, edges, source):
+    dist = {v: float('inf') for v in vertices}
+    dist[source] = 0
+
+    # V-1 relaxation passes
+    for _ in range(len(vertices) - 1):
+        for u, v, w in edges:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+
+    # Negative cycle check
+    for u, v, w in edges:
+        if dist[u] + w < dist[v]:
+            raise ValueError("Negative cycle")
+
+    return dist</code></pre>
+    </div>
+    <div>
+      <h3>Why |V| - 1 passes?</h3>
+      <p>A shortest path in a graph with <code>|V|</code> vertices has at most <code>|V| - 1</code> edges. After pass <code>i</code>, all shortest paths using &le; <code>i</code> edges are found.</p>
+      <table style="margin-top:.4em">
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Time complexity</td><td><code>O(V &middot; E)</code></td></tr>
+          <tr><td>Space complexity</td><td><code>O(V)</code></td></tr>
+          <tr><td>Negative weights</td><td><span class="g">Yes</span></td></tr>
+          <tr><td>Negative cycle detection</td><td><span class="g">Yes</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 08 — Bellman-Ford — Negative Cycle Detection
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">08</span>
+    <h2>Bellman-Ford &mdash; Negative Cycle Detection</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <h3>What is a negative cycle?</h3>
+      <p>A cycle whose total edge weight is negative. If reachable from <code>s</code>, shortest-path distances are <code>-&infin;</code> for all vertices reachable from the cycle.</p>
+      <svg class="diagram" width="260" height="130" viewBox="0 0 260 130">
+        <defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f87171"/></marker></defs>
+        <circle cx="50" cy="65" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="50" y="70" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">A</text>
+        <circle cx="180" cy="25" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="180" y="30" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">B</text>
+        <circle cx="180" cy="105" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="180" y="110" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">C</text>
+        <line x1="70" y1="53" x2="158" y2="30" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="105" y="35" fill="#f5a623" font-family="JetBrains Mono" font-size="12">+2</text>
+        <line x1="180" y1="47" x2="180" y2="81" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="195" y="68" fill="#f5a623" font-family="JetBrains Mono" font-size="12">-5</text>
+        <line x1="160" y1="113" x2="72" y2="78" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="105" y="108" fill="#f5a623" font-family="JetBrains Mono" font-size="12">+1</text>
+      </svg>
+      <p style="font-size:.48em; color:var(--muted); text-align:center">Cycle weight: 2 + (-5) + 1 = <span class="r">-2</span></p>
+    </div>
+    <div>
+      <h3>Detection mechanism</h3>
+      <p>After <code>|V| - 1</code> relaxation passes, all shortest paths are finalized (if no negative cycle). A <code>|V|</code>-th pass that still finds improvements proves a negative cycle exists.</p>
+      <h3 style="margin-top:.3em">Finding the cycle</h3>
+      <ul>
+        <li>Run the extra pass; record any vertex <code>v</code> that improves</li>
+        <li>Follow <code>prev</code> pointers from <code>v</code> for <code>|V|</code> steps to ensure you are on the cycle</li>
+        <li>Trace <code>prev</code> pointers until you revisit a vertex &mdash; that is the cycle</li>
+      </ul>
+      <h3 style="margin-top:.3em">Applications</h3>
+      <div class="card green" style="margin-bottom:.2em">
+        <h3>Currency arbitrage</h3>
+        <p>Model exchange rates as <code>-log(rate)</code> edge weights; a negative cycle means profit</p>
+      </div>
+      <div class="card blue">
+        <h3>Network routing</h3>
+        <p>Detect routing loops in distance-vector protocols</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 09 — SPFA
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">09</span>
+    <h2>SPFA &mdash; Shortest Path Faster Algorithm</h2>
+  </div>
+  <p>SPFA is a queue-based optimisation of Bellman-Ford. Instead of relaxing all edges in every pass, it only re-relaxes vertices whose distances have changed.</p>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-python">from collections import deque
+
+def spfa(graph, source):
+    dist = {v: float('inf') for v in graph}
+    dist[source] = 0
+    in_queue = {v: False for v in graph}
+    in_queue[source] = True
+    queue = deque([source])
+
+    while queue:
+        u = queue.popleft()
+        in_queue[u] = False
+        for v, w in graph[u]:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                if not in_queue[v]:
+                    queue.append(v)
+                    in_queue[v] = True
+    return dist</code></pre>
+    </div>
+    <div>
+      <table>
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Average-case</td><td><code>O(E)</code> on random graphs</td></tr>
+          <tr><td>Worst-case</td><td><code>O(V &middot; E)</code> &mdash; same as Bellman-Ford</td></tr>
+          <tr><td>Negative weights</td><td><span class="g">Yes</span></td></tr>
+          <tr><td>Negative cycle detection</td><td>Count relaxations per vertex; &ge; <code>V</code> times = cycle</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.5em; font-size:.5em; color:var(--muted)">SPFA is popular in competitive programming for its simplicity and good average-case performance. In production systems, Dijkstra with a binary heap is preferred for non-negative weights.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 10 — DAG Shortest Paths
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">10</span>
+    <h2>DAG Shortest Paths via Topological Sort</h2>
+  </div>
+  <p>For directed acyclic graphs, we can find shortest paths in <code>O(V + E)</code> by processing vertices in topological order &mdash; even with negative edge weights.</p>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-python">from collections import deque
+
+def dag_shortest(graph, source):
+    # Kahn's topological sort
+    in_deg = {v: 0 for v in graph}
+    for u in graph:
+        for v, w in graph[u]:
+            in_deg[v] += 1
+    queue = deque(v for v in graph if in_deg[v] == 0)
+    order = []
+    while queue:
+        u = queue.popleft()
+        order.append(u)
+        for v, w in graph[u]:
+            in_deg[v] -= 1
+            if in_deg[v] == 0:
+                queue.append(v)
+
+    # Relax in topological order
+    dist = {v: float('inf') for v in graph}
+    dist[source] = 0
+    for u in order:
+        if dist[u] < float('inf'):
+            for v, w in graph[u]:
+                if dist[u] + w < dist[v]:
+                    dist[v] = dist[u] + w
+    return dist</code></pre>
+    </div>
+    <div>
+      <h3>Why it works</h3>
+      <p>In topological order, all predecessors of <code>v</code> are processed before <code>v</code>. When we relax edges from <code>u</code>, <code>dist[u]</code> is already optimal.</p>
+      <div class="card amber" style="margin-top:.3em; margin-bottom:.2em">
+        <h3>Time &mdash; O(V + E)</h3>
+        <p>Linear &mdash; optimal. No priority queue needed.</p>
+      </div>
+      <div class="card green" style="margin-bottom:.2em">
+        <h3>Handles negative weights</h3>
+        <p>Yes &mdash; because there are no cycles at all.</p>
+      </div>
+      <h3 style="margin-top:.3em">Applications</h3>
+      <ul>
+        <li><span class="a">Critical path analysis</span> &mdash; negate weights; shortest = longest in original</li>
+        <li><span class="g">Project scheduling</span> &mdash; PERT/CPM networks are DAGs</li>
+        <li><span class="p">Dynamic programming</span> &mdash; many DP problems are shortest paths in an implicit DAG</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 11 — Floyd-Warshall
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">11</span>
+    <h2>Floyd-Warshall &mdash; All-Pairs Shortest Paths</h2>
+  </div>
+  <p>Floyd-Warshall computes shortest paths between <span class="a">every pair</span> of vertices using dynamic programming over intermediate vertices.</p>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-python">def floyd_warshall(n, edges):
+    INF = float('inf')
+    dist = [[INF] * n for _ in range(n)]
+    for i in range(n):
+        dist[i][i] = 0
+    for u, v, w in edges:
+        dist[u][v] = w
+
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dist[i][k] + dist[k][j] < dist[i][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
+
+    return dist</code></pre>
+      <h3 style="margin-top:.3em">Recurrence</h3>
+      <p><code>dist<sub>k</sub>(i, j) = min( dist<sub>k-1</sub>(i, j), dist<sub>k-1</sub>(i, k) + dist<sub>k-1</sub>(k, j) )</code></p>
+      <p style="font-size:.48em; color:var(--muted)">At step <code>k</code>, consider whether routing through vertex <code>k</code> improves the path from <code>i</code> to <code>j</code>.</p>
+    </div>
+    <div>
+      <table>
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Time</td><td><code>O(V&sup3;)</code></td></tr>
+          <tr><td>Space</td><td><code>O(V&sup2;)</code></td></tr>
+          <tr><td>Negative weights</td><td><span class="g">Yes</span> (no negative cycles)</td></tr>
+          <tr><td>Negative cycle detection</td><td><code>dist[v][v] &lt; 0</code> for some <code>v</code></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.5em; font-size:.5em; color:var(--muted)">Floyd-Warshall is ideal for dense graphs with small <code>V</code>. For sparse graphs, running Dijkstra from every vertex is faster: <code>O(V &middot; E log V)</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 12 — Johnson's Algorithm
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">12</span>
+    <h2>Johnson's Algorithm</h2>
+  </div>
+  <p>Johnson's computes all-pairs shortest paths efficiently on <span class="a">sparse graphs</span> by combining Bellman-Ford and Dijkstra.</p>
+  <div class="cols cols-3" style="margin-top:.3em">
+    <div class="card amber">
+      <h3>1. Reweight setup</h3>
+      <p>Add vertex <code>q</code> with zero-weight edges to all vertices. Run Bellman-Ford from <code>q</code> to get potential <code>h(v)</code>.</p>
+    </div>
+    <div class="card green">
+      <h3>2. Reweight edges</h3>
+      <p><code>w'(u,v) = w(u,v) + h(u) - h(v)</code><br>Guaranteed non-negative. Path ordering preserved because <code>h</code> values telescope.</p>
+    </div>
+    <div class="card purple">
+      <h3>3. Run V &times; Dijkstra</h3>
+      <p>Remove <code>q</code>. Run Dijkstra from every vertex using <code>w'</code>. Recover: <code>&delta;(u,v) = &delta;'(u,v) - h(u) + h(v)</code>.</p>
+    </div>
+  </div>
+  <table style="margin-top:.4em">
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Time</td><td><code>O(V &middot; E log V)</code> with binary heap Dijkstra</td></tr>
+      <tr><td>Space</td><td><code>O(V&sup2;)</code> for the distance matrix</td></tr>
+      <tr><td>Better than Floyd-Warshall when</td><td><code>E = o(V&sup2;)</code> &mdash; sparse graphs</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:.48em; color:var(--muted); margin-top:.3em">Johnson's is the standard choice for all-pairs on sparse graphs. Floyd-Warshall wins on dense graphs due to simpler constant factors and cache behaviour.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 13 — A* Search
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">13</span>
+    <h2>A* Search</h2>
+  </div>
+  <p>A* is a best-first search for <span class="a">single-pair shortest paths</span> that uses a heuristic to focus exploration toward the goal, dramatically reducing the search space.</p>
+  <div class="cols cols-6040">
+    <div>
+      <h3>Core idea</h3>
+      <p>Prioritise vertices by <code>f(v) = g(v) + h(v)</code>:</p>
+      <ul>
+        <li><code class="g">g(v)</code> &mdash; actual cost from source to <code>v</code></li>
+        <li><code class="p">h(v)</code> &mdash; estimated cost from <code>v</code> to goal (the heuristic)</li>
+        <li><code class="a">f(v)</code> &mdash; estimated total cost of the cheapest path through <code>v</code></li>
+      </ul>
+      <pre><code class="language-python">import heapq
+
+def a_star(graph, source, goal, h):
+    g = {source: 0}
+    prev = {}
+    open_set = [(h(source), source)]
+
+    while open_set:
+        f_val, u = heapq.heappop(open_set)
+        if u == goal:
+            return reconstruct(prev, goal), g[goal]
+        for v, w in graph[u]:
+            tentative = g[u] + w
+            if tentative < g.get(v, float('inf')):
+                g[v] = tentative
+                prev[v] = u
+                heapq.heappush(open_set, (tentative + h(v), v))
+    return None, float('inf')</code></pre>
+    </div>
+    <div>
+      <h3>Relationship to Dijkstra</h3>
+      <div class="card blue" style="margin-bottom:.3em">
+        <p>When <code>h(v) = 0</code> for all <code>v</code>, A* degenerates to Dijkstra's algorithm. The heuristic biases the search toward the goal.</p>
+      </div>
+      <svg class="diagram" width="280" height="160" viewBox="0 0 280 160">
+        <defs><marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#60a5fa"/></marker></defs>
+        <!-- Dijkstra explores broadly -->
+        <circle cx="40" cy="80" r="55" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+        <text x="40" y="145" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10">Dijkstra</text>
+        <!-- A* explores narrowly -->
+        <ellipse cx="140" cy="80" rx="80" ry="30" fill="none" stroke="#4ecb8d" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.7" transform="rotate(-10 140 80)"/>
+        <text x="140" y="120" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="10">A*</text>
+        <!-- source and goal -->
+        <circle cx="40" cy="80" r="10" fill="none" stroke="#f5a623" stroke-width="2"/>
+        <text x="40" y="84" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">s</text>
+        <circle cx="240" cy="80" r="10" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="240" y="84" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="11">t</text>
+        <line x1="52" y1="80" x2="228" y2="80" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah3)"/>
+      </svg>
+      <p style="font-size:.48em; color:var(--muted); text-align:center">A* explores a focused cone toward the goal; Dijkstra explores a full circle.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 14 — A* Heuristics & Admissibility
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">14</span>
+    <h2>A* &mdash; Heuristics &amp; Admissibility</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <h3>Admissible heuristic</h3>
+      <p>A heuristic <code>h</code> is <span class="a">admissible</span> if it never overestimates: <code>h(v) &le; &delta;(v, goal)</code> for all <code>v</code>. Admissibility guarantees A* finds the optimal path.</p>
+      <h3 style="margin-top:.3em">Consistent (monotone) heuristic</h3>
+      <p><code>h</code> is <span class="g">consistent</span> if <code>h(u) &le; w(u,v) + h(v)</code> for every edge <code>(u,v)</code>. Consistency implies admissibility and ensures each vertex is expanded at most once.</p>
+      <h3 style="margin-top:.3em">The trade-off</h3>
+      <ul>
+        <li><code>h = 0</code> &mdash; Dijkstra; explores everything; always optimal</li>
+        <li><code>h = &delta;</code> &mdash; perfect heuristic; A* goes straight to the goal</li>
+        <li><code>h &gt; &delta;</code> &mdash; inadmissible; faster but may return sub-optimal paths</li>
+        <li>Stronger admissible heuristics explore fewer vertices but cost more to compute</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Common heuristics for grids</h3>
+      <table>
+        <thead><tr><th>Heuristic</th><th>Formula</th><th>Grid type</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">Manhattan</span></td><td><code>|x1-x2| + |y1-y2|</code></td><td>4-directional</td></tr>
+          <tr><td><span class="g">Euclidean</span></td><td><code>&radic;((x1-x2)&sup2; + (y1-y2)&sup2;)</code></td><td>Any-angle</td></tr>
+          <tr><td><span class="p">Chebyshev</span></td><td><code>max(|x1-x2|, |y1-y2|)</code></td><td>8-directional</td></tr>
+          <tr><td><span class="b">Octile</span></td><td><code>max(dx,dy) + (&radic;2-1)&middot;min(dx,dy)</code></td><td>8-dir, exact</td></tr>
+        </tbody>
+      </table>
+      <div class="card amber" style="margin-top:.4em">
+        <h3>Choosing a heuristic</h3>
+        <p>The heuristic must be <em>admissible</em> for optimality. For grid pathfinding, Manhattan distance (4-dir) and octile distance (8-dir) are the standard choices. Euclidean is always admissible but slightly weaker.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 15 — Bidirectional Search
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">15</span>
+    <h2>Bidirectional Search</h2>
+  </div>
+  <p>Run two simultaneous searches &mdash; one forward from <code>s</code>, one backward from <code>t</code> &mdash; and terminate when they meet.</p>
+  <div class="cols cols-2">
+    <div>
+      <h3>Unweighted (bidirectional BFS)</h3>
+      <ul>
+        <li>Alternate layers between forward and backward BFS</li>
+        <li>Terminate when a vertex appears in both visited sets</li>
+        <li>Shortest path passes through the meeting vertex</li>
+      </ul>
+      <h3 style="margin-top:.3em">Weighted (bidirectional Dijkstra)</h3>
+      <ul>
+        <li>Run forward and backward Dijkstra simultaneously</li>
+        <li>Alternate extract-min between the two queues</li>
+        <li>Maintain best known path <code>&mu; = min(dist<sub>f</sub>[v] + dist<sub>b</sub>[v])</code></li>
+        <li>Terminate when both fronts exceed <code>&mu;</code></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Performance</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Unidirectional</th><th>Bidirectional</th></tr></thead>
+        <tbody>
+          <tr><td>BFS explored</td><td><code>O(b<sup>d</sup>)</code></td><td><code>O(b<sup>d/2</sup>)</code></td></tr>
+          <tr><td>Speedup</td><td>baseline</td><td>~ <code>b<sup>d/2</sup></code></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.3em">Where <code>b</code> = branching factor, <code>d</code> = shortest path length.</p>
+      <svg class="diagram" width="280" height="100" viewBox="0 0 280 100">
+        <circle cx="40" cy="50" r="40" fill="none" stroke="#4ecb8d" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+        <circle cx="240" cy="50" r="40" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+        <circle cx="40" cy="50" r="8" fill="none" stroke="#f5a623" stroke-width="2"/>
+        <text x="40" y="54" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="10">s</text>
+        <circle cx="240" cy="50" r="8" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="240" y="54" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="10">t</text>
+        <circle cx="140" cy="50" r="6" fill="#f5a623"/>
+        <text x="140" y="75" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="10">meet</text>
+      </svg>
+      <p style="font-size:.48em; color:var(--muted)">Requires knowing the target and being able to traverse edges in reverse.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 16 — Contraction Hierarchies
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">16</span>
+    <h2>Contraction Hierarchies</h2>
+  </div>
+  <p>Contraction hierarchies (CH) are a preprocessing-based speed-up technique for shortest-path queries on static graphs &mdash; the backbone of modern road routing engines.</p>
+  <div class="cols cols-3" style="margin-top:.3em">
+    <div class="card amber">
+      <h3>1. Preprocessing</h3>
+      <ul>
+        <li>Order vertices by "importance" (edge difference, contracted neighbours, ...)</li>
+        <li>Contract vertices from least to most important</li>
+        <li>Add <span class="a">shortcut edges</span> between neighbours if shortest path goes through contracted vertex</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>2. Query</h3>
+      <ul>
+        <li>Run bidirectional Dijkstra relaxing only <span class="g">upward</span> edges in the hierarchy</li>
+        <li>Forward search goes up from <code>s</code>; backward from <code>t</code></li>
+        <li>Meeting point = highest-importance vertex on the shortest path</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>3. Performance</h3>
+      <ul>
+        <li><span class="p">Preprocessing:</span> minutes to hours (one-time, offline)</li>
+        <li><span class="p">Query:</span> microseconds &mdash; typically &lt; 1000 vertices explored on continental road networks</li>
+        <li>3&ndash;6 orders of magnitude faster than plain Dijkstra</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:.4em; font-size:.5em; color:var(--muted)">Google Maps, OSRM, and GraphHopper all use contraction hierarchies or related techniques (ALT, transit nodes). CH is the de facto standard for static road network routing.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 17 — Applications: Routing & Network Protocols
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">17</span>
+    <h2>Applications &mdash; Routing &amp; Network Protocols</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <h3>Road network routing</h3>
+      <p>GPS navigation: preprocess the road graph with contraction hierarchies or A* with landmark heuristics. Real-time traffic requires dynamic edge weights and partial re-computation.</p>
+      <h3 style="margin-top:.3em">Telecommunications</h3>
+      <ul>
+        <li>Minimum-cost routing in telephone switching networks</li>
+        <li>Optical network path computation (GMPLS)</li>
+        <li>Fibre-optic cable laying &mdash; shortest path through geographic terrain</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Network routing protocols</h3>
+      <table>
+        <thead><tr><th>Protocol</th><th>Algorithm</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">OSPF</span></td><td>Dijkstra</td><td>Link-state</td></tr>
+          <tr><td><span class="g">IS-IS</span></td><td>Dijkstra</td><td>Link-state</td></tr>
+          <tr><td><span class="p">RIP</span></td><td>Bellman-Ford</td><td>Distance-vector</td></tr>
+          <tr><td><span class="b">BGP</span></td><td>Path-vector</td><td>Policy-based</td></tr>
+        </tbody>
+      </table>
+      <div class="card blue" style="margin-top:.4em">
+        <p>The Internet literally runs on shortest-path algorithms. Every packet traverses routes computed by Dijkstra (OSPF) or Bellman-Ford (RIP) at the router level.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 18 — Applications: Game AI & Beyond
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">18</span>
+    <h2>Applications &mdash; Game AI &amp; Beyond</h2>
+  </div>
+  <div class="cols cols-3" style="margin-top:.3em">
+    <div class="card amber">
+      <h3>Game AI pathfinding</h3>
+      <ul>
+        <li><span class="a">Grid-based games</span> &mdash; A* with Manhattan/octile heuristic</li>
+        <li><span class="a">Navigation meshes</span> &mdash; A* on polygon mesh for 3D environments</li>
+        <li><span class="a">Hierarchical</span> &mdash; HPA* for coarse + fine search</li>
+        <li><span class="a">Flow fields</span> &mdash; many units to same destination (RTS games)</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>Robotics</h3>
+      <ul>
+        <li><span class="g">Motion planning</span> &mdash; A* or RRT in configuration space</li>
+        <li><span class="g">Autonomous vehicles</span> &mdash; hybrid A* for kinematic constraints</li>
+      </ul>
+      <h3 style="margin-top:.4em">Social networks</h3>
+      <ul>
+        <li>Degrees of separation = shortest path</li>
+        <li>Betweenness centrality identifies influential nodes</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>Bioinformatics</h3>
+      <ul>
+        <li><span class="p">Sequence alignment</span> &mdash; edit-distance graphs</li>
+        <li><span class="p">Metabolic pathways</span> &mdash; shortest paths in reaction networks</li>
+      </ul>
+      <h3 style="margin-top:.4em">Operations research</h3>
+      <ul>
+        <li>Vehicle routing</li>
+        <li>Supply chain optimisation</li>
+        <li>Airline crew scheduling</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 19 — Complexity Comparison
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">19</span>
+    <h2>Complexity Comparison</h2>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Algorithm</th><th>Time</th><th>Space</th><th>Neg. wts</th><th>Neg. cycle</th><th>Use case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="a">BFS</span></td><td><code>O(V+E)</code></td><td><code>O(V)</code></td><td><span class="r">No</span></td><td>N/A</td><td>Unweighted graphs</td></tr>
+      <tr><td><span class="a">Dijkstra (bin. heap)</span></td><td><code>O((V+E) log V)</code></td><td><code>O(V)</code></td><td><span class="r">No</span></td><td><span class="r">No</span></td><td>Non-negative weights (default)</td></tr>
+      <tr><td><span class="a">Dijkstra (Fibonacci)</span></td><td><code>O(V log V + E)</code></td><td><code>O(V)</code></td><td><span class="r">No</span></td><td><span class="r">No</span></td><td>Dense, non-negative</td></tr>
+      <tr><td><span class="g">Bellman-Ford</span></td><td><code>O(V &middot; E)</code></td><td><code>O(V)</code></td><td><span class="g">Yes</span></td><td><span class="g">Yes</span></td><td>Negative weights, cycle detection</td></tr>
+      <tr><td><span class="g">SPFA</span></td><td><code>O(E)</code> avg</td><td><code>O(V)</code></td><td><span class="g">Yes</span></td><td><span class="g">Yes</span></td><td>Competitive programming</td></tr>
+      <tr><td><span class="p">DAG relaxation</span></td><td><code>O(V+E)</code></td><td><code>O(V)</code></td><td><span class="g">Yes</span></td><td>N/A</td><td>DAGs, critical path</td></tr>
+      <tr><td><span class="b">Floyd-Warshall</span></td><td><code>O(V&sup3;)</code></td><td><code>O(V&sup2;)</code></td><td><span class="g">Yes</span></td><td><span class="g">Yes</span></td><td>All-pairs, dense graphs</td></tr>
+      <tr><td><span class="b">Johnson's</span></td><td><code>O(V&middot;E log V)</code></td><td><code>O(V&sup2;)</code></td><td><span class="g">Yes</span></td><td><span class="g">Yes</span></td><td>All-pairs, sparse graphs</td></tr>
+      <tr><td><span class="p">A*</span></td><td><code>O(b<sup>d</sup>)</code> worst</td><td><code>O(b<sup>d</sup>)</code></td><td><span class="r">No</span></td><td><span class="r">No</span></td><td>Single-pair with heuristic</td></tr>
+    </tbody>
+  </table>
+  <div class="card amber" style="margin-top:.4em">
+    <h3>Decision tree</h3>
+    <p>Unweighted? <span class="a">BFS</span>. DAG? <span class="p">Topological sort</span>. Non-negative weights? <span class="a">Dijkstra</span>. Negative weights? <span class="g">Bellman-Ford</span>. All-pairs dense? <span class="b">Floyd-Warshall</span>. All-pairs sparse? <span class="b">Johnson's</span>. Single-pair with domain knowledge? <span class="p">A*</span>.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  SLIDE 20 — Summary & Further Reading
+══════════════════════════════════════════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">20</span>
+    <h2>Summary &amp; Further Reading</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <h3>Key takeaways</h3>
+      <ul>
+        <li>Shortest-path problems have <span class="a">optimal sub-structure</span> &mdash; every sub-path of a shortest path is itself shortest</li>
+        <li><span class="a">Dijkstra</span> is the workhorse for non-negative weights; binary heap + lazy deletion is the practical default</li>
+        <li><span class="g">Bellman-Ford</span> handles negative weights at the cost of <code>O(VE)</code>; its extra pass detects negative cycles</li>
+        <li><span class="b">Floyd-Warshall</span> solves all-pairs in <code>O(V&sup3;)</code> &mdash; ideal for dense graphs with small vertex counts</li>
+        <li><span class="b">Johnson's</span> beats Floyd-Warshall on sparse graphs by reweighting to eliminate negatives</li>
+        <li><span class="p">A*</span> focuses search with a heuristic; admissibility guarantees optimality</li>
+        <li><span class="a">Contraction hierarchies</span> make continental-scale routing feasible in microseconds</li>
+        <li>The choice of algorithm depends on graph structure, weight constraints, and query type</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Recommended reading</h3>
+      <table>
+        <thead><tr><th>Source</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">CLRS</span></td><td><em>Introduction to Algorithms</em> &mdash; chapters 22&ndash;25</td></tr>
+          <tr><td><span class="g">Kleinberg &amp; Tardos</span></td><td><em>Algorithm Design</em> &mdash; shortest paths and network flow</td></tr>
+          <tr><td><span class="p">Hart, Nilsson, Raphael</span></td><td>Original A* paper (1968)</td></tr>
+          <tr><td><span class="b">Geisberger et al.</span></td><td>Contraction Hierarchies paper (2008)</td></tr>
+          <tr><td><span class="a">Sedgewick &amp; Wayne</span></td><td><em>Algorithms</em> 4th ed. &mdash; Java implementations</td></tr>
+          <tr><td><span class="g">Jeff Erickson</span></td><td><em>Algorithms</em> &mdash; free online textbook</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  controls: true,
+  progress: true,
+  center: false,
+  width: 1100,
+  height: 900,
+  margin: 0.01,
+  plugins: [RevealHighlight],
+  highlight: { theme: 'monokai' }
+});
+</script>
+<script>
+(function(){
+  var h = Reveal.getConfig().height || 900;
+  var m = Reveal.getConfig().margin || 0.02;
+  var maxH = Math.floor(h * (1 - 2 * m)) + 'px';
+  function fixSlides(){
+    document.querySelectorAll('.reveal .slides>section,.reveal .slides>section>section').forEach(function(s){
+      s.style.display = 'block';
+      s.style.maxHeight = maxH;
+    });
+  }
+  Reveal.on('ready', fixSlides);
+  Reveal.on('slidechanged', fixSlides);
+})();
+</script>
+</body>
+</html>
