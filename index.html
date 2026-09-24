@@ -6,7 +6,7 @@
   <title>Shortest Path Algorithms</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,17 +14,17 @@
 
   <style>
   :root {
-    --amber:  #f5a623;
-    --green:  #4ecb8d;
-    --purple: #a78bfa;
-    --blue:   #60a5fa;
-    --red:    #f87171;
-    --bg:     #0a0a0f;
-    --bg2:    #10101a;
-    --bg3:    #181824;
-    --border: #2a2a3a;
-    --text:   #e8e8f0;
-    --muted:  #8888a8;
+    --amber:  #bf7d10;
+    --green:  #1c815a;
+    --purple: #6435bc;
+    --blue:   #2b3dc5;
+    --red:    #db3a30;
+    --bg:     #fafaf8;
+    --bg2:    #f1f1ee;
+    --bg3:    #eaeae6;
+    --border: #d1d1cb;
+    --text:   #161616;
+    --muted:  #6a6a63;
   }
 
   .reveal-viewport { background: var(--bg); }
@@ -40,7 +40,7 @@
   .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
   .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
                  border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
-  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #242422; }
 
   /* ── slide chrome ── */
   .slide-hdr {
@@ -75,16 +75,16 @@
   .card.blue  { border-left: 3px solid var(--blue); }
   .card.red   { border-left: 3px solid var(--red); }
   .card h3 { font-size: .64em; margin: 0 0 .12em; }
-  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card p  { font-size: .52em; margin: 0; color: #3d3d39; }
   .card ul { margin: 0; padding-left: 1em; }
-  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+  .card li { font-size: .52em; color: #3d3d39; margin-bottom: .02em; }
 
   /* ── table ── */
   .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
   .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
                      padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
-  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
-  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #2d2d2b; }
+  .reveal table tr:nth-child(even) td { background: #f3f3f1; }
 
   /* ── accent spans ── */
   .a  { color: var(--amber); font-weight: 600; }
@@ -127,8 +127,8 @@
     padding: .2em .55em; border-radius: 5px; font-size: .9em;
     background: var(--bg3); border: 1px solid var(--border); color: var(--text);
   }
-  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
-  .ss-node.done   { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-node.active { background: #d3e1d5; border-color: var(--green); color: var(--green); }
+  .ss-node.done   { background: #e6e6e2; border-color: var(--purple); color: var(--purple); }
   .ss-arrow { color: var(--amber); }
   .ss-label { font-size: .8em; color: var(--muted); margin-left: .3em; }
 
@@ -136,6 +136,7 @@
   .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
 .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
 </style>
+<style>.reveal .slide-number{background-color:transparent}</style>
 </head>
 <body>
 <div class="reveal">
@@ -144,7 +145,7 @@
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 01 — Title
 ══════════════════════════════════════════════════════════════════ -->
-<section class="title-slide" data-background-color="#0a0a0f">
+<section class="title-slide" data-background-color="#fafaf8">
   <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">COMPUTER SCIENCE FUNDAMENTALS SERIES</div>
   <h1>Shortest Path<br>Algorithms</h1>
   <div class="subtitle">
@@ -160,7 +161,7 @@
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 02 — Single-Source Shortest Path Problem
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">02</span>
     <h2>Single-Source Shortest Path Problem</h2>
@@ -190,27 +191,27 @@
       </table>
       <div style="margin-top:.6em">
         <svg class="diagram" width="320" height="140" viewBox="0 0 320 140">
-          <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f5a623"/></marker></defs>
-          <circle cx="40" cy="70" r="20" fill="none" stroke="#4ecb8d" stroke-width="2"/>
-          <text x="40" y="75" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="14">s</text>
-          <circle cx="140" cy="30" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
-          <text x="140" y="35" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">a</text>
-          <circle cx="140" cy="110" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
-          <text x="140" y="115" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">b</text>
-          <circle cx="240" cy="70" r="20" fill="none" stroke="#a78bfa" stroke-width="2"/>
-          <text x="240" y="75" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="14">c</text>
-          <circle cx="300" cy="70" r="20" fill="none" stroke="#f87171" stroke-width="2"/>
-          <text x="300" y="75" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">t</text>
-          <line x1="60" y1="58" x2="118" y2="35" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
-          <text x="80" y="40" fill="#8888a8" font-family="JetBrains Mono" font-size="11">4</text>
-          <line x1="60" y1="82" x2="118" y2="105" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
-          <text x="80" y="105" fill="#8888a8" font-family="JetBrains Mono" font-size="11">2</text>
-          <line x1="160" y1="30" x2="218" y2="62" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
-          <text x="185" y="38" fill="#8888a8" font-family="JetBrains Mono" font-size="11">3</text>
-          <line x1="160" y1="105" x2="218" y2="78" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
-          <text x="185" y="105" fill="#8888a8" font-family="JetBrains Mono" font-size="11">5</text>
-          <line x1="260" y1="70" x2="278" y2="70" stroke="#f5a623" stroke-width="1.5" marker-end="url(#ah)"/>
-          <text x="268" y="62" fill="#8888a8" font-family="JetBrains Mono" font-size="11">1</text>
+          <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf7d10"/></marker></defs>
+          <circle cx="40" cy="70" r="20" fill="none" stroke="#1c815a" stroke-width="2"/>
+          <text x="40" y="75" text-anchor="middle" fill="#1c815a" font-family="JetBrains Mono" font-size="14">s</text>
+          <circle cx="140" cy="30" r="20" fill="none" stroke="#6435bc" stroke-width="2"/>
+          <text x="140" y="35" text-anchor="middle" fill="#6435bc" font-family="JetBrains Mono" font-size="14">a</text>
+          <circle cx="140" cy="110" r="20" fill="none" stroke="#6435bc" stroke-width="2"/>
+          <text x="140" y="115" text-anchor="middle" fill="#6435bc" font-family="JetBrains Mono" font-size="14">b</text>
+          <circle cx="240" cy="70" r="20" fill="none" stroke="#6435bc" stroke-width="2"/>
+          <text x="240" y="75" text-anchor="middle" fill="#6435bc" font-family="JetBrains Mono" font-size="14">c</text>
+          <circle cx="300" cy="70" r="20" fill="none" stroke="#db3a30" stroke-width="2"/>
+          <text x="300" y="75" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="14">t</text>
+          <line x1="60" y1="58" x2="118" y2="35" stroke="#bf7d10" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="80" y="40" fill="#6a6a63" font-family="JetBrains Mono" font-size="11">4</text>
+          <line x1="60" y1="82" x2="118" y2="105" stroke="#bf7d10" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="80" y="105" fill="#6a6a63" font-family="JetBrains Mono" font-size="11">2</text>
+          <line x1="160" y1="30" x2="218" y2="62" stroke="#bf7d10" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="185" y="38" fill="#6a6a63" font-family="JetBrains Mono" font-size="11">3</text>
+          <line x1="160" y1="105" x2="218" y2="78" stroke="#bf7d10" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="185" y="105" fill="#6a6a63" font-family="JetBrains Mono" font-size="11">5</text>
+          <line x1="260" y1="70" x2="278" y2="70" stroke="#bf7d10" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="268" y="62" fill="#6a6a63" font-family="JetBrains Mono" font-size="11">1</text>
         </svg>
       </div>
     </div>
@@ -220,7 +221,7 @@
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 03 — BFS for Unweighted Graphs
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">03</span>
     <h2>BFS for Unweighted Graphs</h2>
@@ -267,7 +268,7 @@ def bfs_shortest(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 04 — Dijkstra's Algorithm
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">04</span>
     <h2>Dijkstra's Algorithm</h2>
@@ -308,7 +309,7 @@ def bfs_shortest(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 05 — Dijkstra — Priority Queue Implementation
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">05</span>
     <h2>Dijkstra &mdash; Priority Queue Implementation</h2>
@@ -357,7 +358,7 @@ def dijkstra(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 06 — Dijkstra — Proof of Correctness
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">06</span>
     <h2>Dijkstra &mdash; Proof of Correctness</h2>
@@ -401,7 +402,7 @@ def dijkstra(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 07 — Bellman-Ford Algorithm
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">07</span>
     <h2>Bellman-Ford Algorithm</h2>
@@ -445,7 +446,7 @@ def dijkstra(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 08 — Bellman-Ford — Negative Cycle Detection
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">08</span>
     <h2>Bellman-Ford &mdash; Negative Cycle Detection</h2>
@@ -455,19 +456,19 @@ def dijkstra(graph, source):
       <h3>What is a negative cycle?</h3>
       <p>A cycle whose total edge weight is negative. If reachable from <code>s</code>, shortest-path distances are <code>-&infin;</code> for all vertices reachable from the cycle.</p>
       <svg class="diagram" width="260" height="130" viewBox="0 0 260 130">
-        <defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f87171"/></marker></defs>
-        <circle cx="50" cy="65" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
-        <text x="50" y="70" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">A</text>
-        <circle cx="180" cy="25" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
-        <text x="180" y="30" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">B</text>
-        <circle cx="180" cy="105" r="22" fill="none" stroke="#f87171" stroke-width="2"/>
-        <text x="180" y="110" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="14">C</text>
-        <line x1="70" y1="53" x2="158" y2="30" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
-        <text x="105" y="35" fill="#f5a623" font-family="JetBrains Mono" font-size="12">+2</text>
-        <line x1="180" y1="47" x2="180" y2="81" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
-        <text x="195" y="68" fill="#f5a623" font-family="JetBrains Mono" font-size="12">-5</text>
-        <line x1="160" y1="113" x2="72" y2="78" stroke="#f87171" stroke-width="1.5" marker-end="url(#ah2)"/>
-        <text x="105" y="108" fill="#f5a623" font-family="JetBrains Mono" font-size="12">+1</text>
+        <defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#db3a30"/></marker></defs>
+        <circle cx="50" cy="65" r="22" fill="none" stroke="#db3a30" stroke-width="2"/>
+        <text x="50" y="70" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="14">A</text>
+        <circle cx="180" cy="25" r="22" fill="none" stroke="#db3a30" stroke-width="2"/>
+        <text x="180" y="30" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="14">B</text>
+        <circle cx="180" cy="105" r="22" fill="none" stroke="#db3a30" stroke-width="2"/>
+        <text x="180" y="110" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="14">C</text>
+        <line x1="70" y1="53" x2="158" y2="30" stroke="#db3a30" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="105" y="35" fill="#bf7d10" font-family="JetBrains Mono" font-size="12">+2</text>
+        <line x1="180" y1="47" x2="180" y2="81" stroke="#db3a30" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="195" y="68" fill="#bf7d10" font-family="JetBrains Mono" font-size="12">-5</text>
+        <line x1="160" y1="113" x2="72" y2="78" stroke="#db3a30" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="105" y="108" fill="#bf7d10" font-family="JetBrains Mono" font-size="12">+1</text>
       </svg>
       <p style="font-size:.48em; color:var(--muted); text-align:center">Cycle weight: 2 + (-5) + 1 = <span class="r">-2</span></p>
     </div>
@@ -496,7 +497,7 @@ def dijkstra(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 09 — SPFA
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">09</span>
     <h2>SPFA &mdash; Shortest Path Faster Algorithm</h2>
@@ -542,7 +543,7 @@ def spfa(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 10 — DAG Shortest Paths
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">10</span>
     <h2>DAG Shortest Paths via Topological Sort</h2>
@@ -602,7 +603,7 @@ def dag_shortest(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 11 — Floyd-Warshall
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">11</span>
     <h2>Floyd-Warshall &mdash; All-Pairs Shortest Paths</h2>
@@ -647,7 +648,7 @@ def dag_shortest(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 12 — Johnson's Algorithm
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">12</span>
     <h2>Johnson's Algorithm</h2>
@@ -681,7 +682,7 @@ def dag_shortest(graph, source):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 13 — A* Search
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">13</span>
     <h2>A* Search</h2>
@@ -721,19 +722,19 @@ def a_star(graph, source, goal, h):
         <p>When <code>h(v) = 0</code> for all <code>v</code>, A* degenerates to Dijkstra's algorithm. The heuristic biases the search toward the goal.</p>
       </div>
       <svg class="diagram" width="280" height="160" viewBox="0 0 280 160">
-        <defs><marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#60a5fa"/></marker></defs>
+        <defs><marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2b3dc5"/></marker></defs>
         <!-- Dijkstra explores broadly -->
-        <circle cx="40" cy="80" r="55" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
-        <text x="40" y="145" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10">Dijkstra</text>
+        <circle cx="40" cy="80" r="55" fill="none" stroke="#6435bc" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+        <text x="40" y="145" text-anchor="middle" fill="#6435bc" font-family="JetBrains Mono" font-size="10">Dijkstra</text>
         <!-- A* explores narrowly -->
-        <ellipse cx="140" cy="80" rx="80" ry="30" fill="none" stroke="#4ecb8d" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.7" transform="rotate(-10 140 80)"/>
-        <text x="140" y="120" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="10">A*</text>
+        <ellipse cx="140" cy="80" rx="80" ry="30" fill="none" stroke="#1c815a" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.7" transform="rotate(-10 140 80)"/>
+        <text x="140" y="120" text-anchor="middle" fill="#1c815a" font-family="JetBrains Mono" font-size="10">A*</text>
         <!-- source and goal -->
-        <circle cx="40" cy="80" r="10" fill="none" stroke="#f5a623" stroke-width="2"/>
-        <text x="40" y="84" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">s</text>
-        <circle cx="240" cy="80" r="10" fill="none" stroke="#f87171" stroke-width="2"/>
-        <text x="240" y="84" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="11">t</text>
-        <line x1="52" y1="80" x2="228" y2="80" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah3)"/>
+        <circle cx="40" cy="80" r="10" fill="none" stroke="#bf7d10" stroke-width="2"/>
+        <text x="40" y="84" text-anchor="middle" fill="#bf7d10" font-family="JetBrains Mono" font-size="11">s</text>
+        <circle cx="240" cy="80" r="10" fill="none" stroke="#db3a30" stroke-width="2"/>
+        <text x="240" y="84" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="11">t</text>
+        <line x1="52" y1="80" x2="228" y2="80" stroke="#2b3dc5" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah3)"/>
       </svg>
       <p style="font-size:.48em; color:var(--muted); text-align:center">A* explores a focused cone toward the goal; Dijkstra explores a full circle.</p>
     </div>
@@ -743,7 +744,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 14 — A* Heuristics & Admissibility
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">14</span>
     <h2>A* &mdash; Heuristics &amp; Admissibility</h2>
@@ -784,7 +785,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 15 — Bidirectional Search
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">15</span>
     <h2>Bidirectional Search</h2>
@@ -817,14 +818,14 @@ def a_star(graph, source, goal, h):
       </table>
       <p style="margin-top:.3em">Where <code>b</code> = branching factor, <code>d</code> = shortest path length.</p>
       <svg class="diagram" width="280" height="100" viewBox="0 0 280 100">
-        <circle cx="40" cy="50" r="40" fill="none" stroke="#4ecb8d" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
-        <circle cx="240" cy="50" r="40" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
-        <circle cx="40" cy="50" r="8" fill="none" stroke="#f5a623" stroke-width="2"/>
-        <text x="40" y="54" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="10">s</text>
-        <circle cx="240" cy="50" r="8" fill="none" stroke="#f87171" stroke-width="2"/>
-        <text x="240" y="54" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="10">t</text>
-        <circle cx="140" cy="50" r="6" fill="#f5a623"/>
-        <text x="140" y="75" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="10">meet</text>
+        <circle cx="40" cy="50" r="40" fill="none" stroke="#1c815a" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+        <circle cx="240" cy="50" r="40" fill="none" stroke="#6435bc" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+        <circle cx="40" cy="50" r="8" fill="none" stroke="#bf7d10" stroke-width="2"/>
+        <text x="40" y="54" text-anchor="middle" fill="#bf7d10" font-family="JetBrains Mono" font-size="10">s</text>
+        <circle cx="240" cy="50" r="8" fill="none" stroke="#db3a30" stroke-width="2"/>
+        <text x="240" y="54" text-anchor="middle" fill="#db3a30" font-family="JetBrains Mono" font-size="10">t</text>
+        <circle cx="140" cy="50" r="6" fill="#bf7d10"/>
+        <text x="140" y="75" text-anchor="middle" fill="#6a6a63" font-family="JetBrains Mono" font-size="10">meet</text>
       </svg>
       <p style="font-size:.48em; color:var(--muted)">Requires knowing the target and being able to traverse edges in reverse.</p>
     </div>
@@ -834,7 +835,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 16 — Contraction Hierarchies
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">16</span>
     <h2>Contraction Hierarchies</h2>
@@ -872,7 +873,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 17 — Applications: Routing & Network Protocols
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">17</span>
     <h2>Applications &mdash; Routing &amp; Network Protocols</h2>
@@ -909,7 +910,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 18 — Applications: Game AI & Beyond
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">18</span>
     <h2>Applications &mdash; Game AI &amp; Beyond</h2>
@@ -955,7 +956,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 19 — Complexity Comparison
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">19</span>
     <h2>Complexity Comparison</h2>
@@ -985,7 +986,7 @@ def a_star(graph, source, goal, h):
 <!-- ═══════════════════════════════════════════════════════════════
   SLIDE 20 — Summary & Further Reading
 ══════════════════════════════════════════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#fafaf8">
   <div class="slide-hdr">
     <span class="tag">20</span>
     <h2>Summary &amp; Further Reading</h2>
